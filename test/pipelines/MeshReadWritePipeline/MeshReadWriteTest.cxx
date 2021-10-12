@@ -44,6 +44,10 @@ int main( int argc, char * argv[] )
 
   try
     {
+reader->Update();
+    auto inputMesh = reader->GetOutput();
+    auto numCells = inputMesh->GetNumberOfCells();
+std::cout << "numCells: " << numCells << std::endl;
     writer->Update();
     }
   catch( itk::ExceptionObject & error )

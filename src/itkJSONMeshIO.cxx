@@ -483,7 +483,9 @@ JSONMeshIO
   this->SetNumberOfPointPixelComponents( meshType["pointPixelComponents"].GetInt() );
 
   const std::string cellComponentType( meshType["cellComponentType"].GetString() );
+  std::cout << "cellcomponenttype: " << cellComponentType << std::endl;
   const CommonEnums::IOComponent cellIOComponentType = this->JSToITKComponentType( cellComponentType );
+  std::cout << "cell io component type: " << cellIOComponentType << std::endl;
   this->SetCellComponentType( cellIOComponentType );
 
   const std::string cellPixelComponentType( meshType["cellPixelComponentType"].GetString() );
@@ -512,8 +514,10 @@ JSONMeshIO
 
   const rapidjson::Value & numberOfCells = document["numberOfCells"];
   this->SetNumberOfCells( numberOfCells.GetInt() );
+  std::cout << "Read Information number cells: " << numberOfCells.GetInt() << std::endl;
   if ( numberOfCells.GetInt() )
     {
+    std::cout << "Updating Cells~~" << std::endl;
     this->m_UpdateCells = true;
     }
 
@@ -525,6 +529,7 @@ JSONMeshIO
     }
 
   const rapidjson::Value & cellBufferSize = document["cellBufferSize"];
+  std::cout << "Read Cell buffer size: " << cellBufferSize.GetInt() << std::endl;
   this->SetCellBufferSize( cellBufferSize.GetInt() );
 }
 
@@ -578,8 +583,12 @@ JSONMeshIO
   const std::string dataFile( document["cells"].GetString() );
   std::ifstream dataStream;
   this->OpenFileForReading( dataStream, dataFile.c_str() );
+  std::cout << "cell buffersize: " << this->GetCellBufferSize() << std::endl;
+  std::cout << "cell component type: " << this->GetCellComponentType() << std::endl;
+  std::cout << "itkcomponentsize: " << ITKComponentSize( this->GetCellComponentType() )  << std::endl;
   const SizeValueType numberOfBytesToBeRead =
-    static_cast< SizeValueType >( this->GetCellBufferSize() * ITKComponentSize( this->GetCellComponentType() ) );
+    static_cast< SizeValueType >( this->GetCellBufferSize() * ITKComponentSize( this->GetCellComponentType() ));
+  std::cout << "numberOfBytesToBeRead: " << numberOfBytesToBeRead << std::endl;
 
   if ( !this->ReadBufferAsBinary( dataStream, buffer, numberOfBytesToBeRead ) )
     {
@@ -588,6 +597,7 @@ JSONMeshIO
                       << " bytes, but read "
                       << dataStream.gcount() << " bytes.");
     }
+  std::cout << "Read : " << dataStream.gcount() << " bytes." << std::endl;
 }
 
 
@@ -750,6 +760,7 @@ JSONMeshIO
 
   rapidjson::Value numberOfCells;
   numberOfCells.SetInt( this->GetNumberOfCells() );
+  std::cout << "get NumberOfCells: " << this->GetNumberOfCells() << std::endl;
   document.AddMember( "numberOfCells", numberOfCells.Move(), allocator );
   if ( this->GetNumberOfCells() )
     {
@@ -817,6 +828,10 @@ JSONMeshIO
   const std::string fileName = std::string( this->GetFileName() ) + ".cells.data";
   std::ofstream outputStream;
   this->OpenFileForWriting( outputStream, fileName, true, false );
+  std::cout << "cecllbuffersize: " << this->GetCellBufferSize() << std::endl;
+  std::cout << "cell component type: " << this->GetCellComponentType() << std::endl;
+  const SizeValueType numberOfBytes = this->GetCellBufferSize() * ITKComponentSize( this->GetCellComponentType() );
+ std::cout << "writing : " << numberOfBytes << std::endl;
   // Cast from 64 bit unsigned integers (not supported in JavaScript) to 32
   // bit unsigned integers
   const IdentifierType * bufferIdentifier = static_cast< IdentifierType * >( buffer );

@@ -6,7 +6,9 @@ import { spawnSync } from 'child_process'
 import glob from 'glob'
 import asyncMod from 'async'
 
-import program from 'commander'
+import { Command } from 'commander/esm.mjs'
+
+const program = new Command()
 
 // Make the "build" directory to hold build artifacts
 try {
@@ -15,13 +17,15 @@ try {
   if (err.code !== 'EEXIST') throw err
 }
 program
-  .option('-c, --no-compile', 'Do not compile Emscripten modules')
+  .option('-i, --no-build-io', 'Do not compile io modules')
   .option('-s, --no-copy-build-artifacts', 'Do not copy build artifacts')
   .option('-p, --no-build-pipelines', 'Do not build the test pipelines')
   .option('-d, --debug', 'Create a debug build of the Emscripten modules')
   .parse(process.argv)
 
-if (program.compile) {
+const options = program.opts()
+
+if (options.buildIo) {
   // Make the "build" directory to hold build artifacts
   try {
     fs.mkdirSync('build')
@@ -46,7 +50,7 @@ if (program.compile) {
 
   // Ensure we have the 'dockcross' Docker build environment driver script
   let dockcross = 'build/dockcross'
-  if (program.debug) {
+  if (options.debug) {
     dockcross = 'build/dockcross-debug'
   }
   try {
@@ -55,9 +59,9 @@ if (program.compile) {
     if (err.code === 'ENOENT') {
       const output = fs.openSync(dockcross, 'w')
       let buildImage = 'insighttoolkit/itk-js:latest'
-      //if (program.debug) {
-        //buildImage = 'kitware/itk-js-vtk:20210219-56503df-debug'
-      //}
+      if (options.debug) {
+        buildImage = 'insighttoolkit/itk-js:latest-debug'
+      }
       const dockerCall = spawnSync('docker', ['run', '--rm', buildImage], {
         env: process.env,
         stdio: ['ignore', output, null]
@@ -78,7 +82,7 @@ if (program.compile) {
   } catch (err) {
     if (err.code === 'ENOENT') {
       let buildType = '-DCMAKE_BUILD_TYPE:STRING=Release'
-      if (program.debug) {
+      if (options.debug) {
         buildType = '-DCMAKE_BUILD_TYPE:STRING=Debug'
       }
       const cmakeCall = spawnSync('bash', [dockcross, 'bash', '-c', `cmake -DRapidJSON_INCLUDE_DIR=/rapidjson/include ${buildType} -Bbuild -H. -GNinja -DITK_DIR=/ITK-build -DVTK_DIR=/VTK-build -DBUILD_ITK_JS_IO_MODULES=ON`], {
@@ -103,9 +107,9 @@ if (program.compile) {
     process.exit(ninjaCall.status)
   }
   console.log('')
-} // program.compile
+} // options.compile
 
-if (program.copyBuildArtifacts) {
+if (options.copyBuildArtifacts) {
   try {
     fs.mkdirSync('dist')
   } catch (err) {
@@ -177,16 +181,18 @@ if (program.copyBuildArtifacts) {
     buildMeshIOsParallel,
     buildPolyDataIOsParallel,
   ])
-} // program.copySources
+} // options.copySources
 
-if (program.buildPipelines) {
+if (options.buildPipelines) {
   const buildPipeline = (pipelinePath) => {
     console.log('Building ' + pipelinePath + ' ...')
     let debugFlags = []
-    if (program.debug) {
+    let buildImage = 'insighttoolkit/itk-js:latest'
+    if (options.debug) {
       debugFlags = ['-DCMAKE_BUILD_TYPE:STRING=Debug', "-DCMAKE_EXE_LINKER_FLAGS_DEBUG='-s DISABLE_EXCEPTION_CATCHING=0'"]
+      buildImage = 'insighttoolkit/itk-js:latest-debug'
     }
-    const buildPipelineCall = spawnSync('node', [path.join('src', 'itk-js-cli.js'), 'build', '--image', 'insighttoolkit/itk-js:latest', pipelinePath, '--'].concat(debugFlags), {
+    const buildPipelineCall = spawnSync('node', [path.join('src', 'itk-js-cli.js'), 'build', '--image', buildImage, pipelinePath, '--'].concat(debugFlags), {
       env: process.env,
       stdio: 'inherit'
     })
@@ -195,6 +201,29 @@ if (program.buildPipelines) {
     }
     let pipelineFiles = glob.sync(path.join(pipelinePath, 'web-build', '*.js'))
     pipelineFiles = pipelineFiles.concat(glob.sync(path.join(pipelinePath, 'web-build', '*.wasm')))
+    pipelineFiles.forEach((file) => {
+      const filename = path.basename(file)
+      const output = path.join('dist', 'pipeline', filename)
+      fs.copySync(file, output)
+    })
+  }
+
+  const buildPipelineWasi = (pipelinePath) => {
+    console.log('Building ' + pipelinePath + ' with wasi...')
+    let debugFlags = []
+    let buildImage = 'insighttoolkit/itk-js-wasi:latest'
+    if (options.debug) {
+      debugFlags = ['-DCMAKE_BUILD_TYPE:STRING=Debug']
+      buildImage = 'insighttoolkit/itk-js-wasi:latest-debug'
+    }
+    const buildPipelineCall = spawnSync('node', [path.join('src', 'itk-js-cli.js'), 'build', '--image', buildImage, '--build-dir', 'wasi-build', pipelinePath, '--'].concat(debugFlags), {
+      env: process.env,
+      stdio: 'inherit'
+    })
+    if (buildPipelineCall.status !== 0) {
+      process.exit(buildPipelineCall.status)
+    }
+    const pipelineFiles = glob.sync(path.join(pipelinePath, 'wasi-build', '*.wasm'))
     pipelineFiles.forEach((file) => {
       const filename = path.basename(file)
       const output = path.join('dist', 'pipeline', filename)
@@ -217,5 +246,6 @@ if (program.buildPipelines) {
   } catch (err) {
     if (err.code !== 'EEXIST') throw err
   }
-  asyncMod.map(pipelines, buildPipeline)
+  //asyncMod.map(pipelines, buildPipeline)
+  asyncMod.map(pipelines, buildPipelineWasi)
 } // progrem

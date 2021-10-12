@@ -33,7 +33,7 @@ namespace itk
  * It reads and writes an itk.js itk/Mesh JSON object where TypedArrays are
  * replaced by binary files on the filesystem.
  *
- * The formt is experimental and subject to change. We mean it.
+ * The format is experimental and subject to change. We mean it.
  *
  * \ingroup IOFilters
  * \ingroup BridgeJavaScript

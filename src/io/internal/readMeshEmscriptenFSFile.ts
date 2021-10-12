@@ -25,7 +25,9 @@ function readMeshEmscriptenFSFile(emscriptenModule: MeshIOBaseEmscriptenModule, 
   }
 
   const ioCellComponentType = meshIO.GetCellComponentType()
+  console.log('ioCellComponentType', ioCellComponentType)
   const cellComponentType = meshIOComponentToJSComponent(emscriptenModule, ioCellComponentType)
+  console.log('cellComponentType', cellComponentType)
   if (cellComponentType === null) {
     throw Error('cell component type cannot be unknown / null')
   }

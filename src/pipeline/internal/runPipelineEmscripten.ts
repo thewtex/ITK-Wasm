@@ -42,13 +42,13 @@ function readFileSharedArray(emscriptenModule: PipelineEmscriptenModule, path: s
   const stream = emscriptenModule.fs_open(path, opts.flags)
   const stat = emscriptenModule.fs_stat(path)
   const length = stat.size
-  let arrayBuffer = null
+  let arrayBufferData = null
   if (haveSharedArrayBuffer) {
-    arrayBuffer = new SharedArrayBuffer(length) // eslint-disable-line
+    arrayBufferData = new SharedArrayBuffer(length) // eslint-disable-line
   } else {
-    arrayBuffer = new ArrayBuffer(length)
+    arrayBufferData = new ArrayBuffer(length)
   }
-  const array = new Uint8Array(arrayBuffer)
+  const array = new Uint8Array(arrayBufferData)
   emscriptenModule.fs_read(stream, array, 0, length, 0)
   emscriptenModule.fs_close(stream)
   return array
@@ -70,7 +70,7 @@ function runPipelineEmscripten(pipelineModule: PipelineEmscriptenModule, args: s
         }
         case IOTypes.Image:
         {
-          const image: Image = input.data as any
+          const image = input.data as Image
           const imageJSON = {
             imageType: image.imageType,
             name: image.name,
@@ -84,12 +84,12 @@ function runPipelineEmscripten(pipelineModule: PipelineEmscriptenModule, args: s
           if (image.data === null) {
             throw Error('image.data is null')
           }
-          pipelineModule.fs_writeFile(imageJSON.data, new Uint8Array(image.data.buffer))
+          pipelineModule.fs_writeFile(imageJSON.data, image.data)
           break
         }
         case IOTypes.Mesh:
         {
-          const mesh: Mesh = input.data as any
+          const mesh = input.data as Mesh
           const meshJSON = {
             meshType: mesh.meshType,
             name: mesh.name,
@@ -108,30 +108,31 @@ function runPipelineEmscripten(pipelineModule: PipelineEmscriptenModule, args: s
             cellBufferSize: mesh.cellBufferSize,
 
           }
+          console.log('meshJSON', meshJSON)
           pipelineModule.fs_writeFile(input.path, JSON.stringify(meshJSON))
           if (meshJSON.numberOfPoints) {
             if (mesh.points === null) {
               throw Error('mesh.points is null')
             }
-            pipelineModule.fs_writeFile(meshJSON.points, new Uint8Array(mesh.points.buffer))
+            pipelineModule.fs_writeFile(meshJSON.points, mesh.points)
           }
           if (meshJSON.numberOfPointPixels) {
             if (mesh.pointData === null) {
               throw Error('mesh.pointData is null')
             }
-            pipelineModule.fs_writeFile(meshJSON.pointData, new Uint8Array(mesh.pointData.buffer))
+            pipelineModule.fs_writeFile(meshJSON.pointData, mesh.pointData)
           }
           if (meshJSON.numberOfCells) {
             if (mesh.cells === null) {
               throw Error('mesh.cells is null')
             }
-            pipelineModule.fs_writeFile(meshJSON.cells, new Uint8Array(mesh.cells.buffer))
+            pipelineModule.fs_writeFile(meshJSON.cells, mesh.cells)
           }
           if (meshJSON.numberOfCellPixels) {
             if (mesh.cellData === null) {
               throw Error('mesh.cellData is null')
             }
-            pipelineModule.fs_writeFile(meshJSON.cellData, new Uint8Array(mesh.cellData.buffer))
+            pipelineModule.fs_writeFile(meshJSON.cellData, mesh.cellData)
           }
           break
         }
@@ -158,20 +159,21 @@ function runPipelineEmscripten(pipelineModule: PipelineEmscriptenModule, args: s
   }
   const stdout = pipelineModule.getModuleStdout()
   const stderr = pipelineModule.getModuleStderr()
+  console.log('stdout,stderr', stdout, stderr)
 
   const populatedOutputs: PipelineOutput[] = []
   if (outputs) {
     outputs.forEach(function (output) {
-      let data: any = null
+      let outputData: any = null
       switch (output.type) {
         case IOTypes.Text:
         {
-          data = pipelineModule.fs_readFile(output.path, { encoding: 'utf8' }) as string
+          outputData = pipelineModule.fs_readFile(output.path, { encoding: 'utf8' }) as string
           break
         }
         case IOTypes.Binary:
         {
-          data = readFileSharedArray(pipelineModule, output.path) as Uint8Array
+          outputData = readFileSharedArray(pipelineModule, output.path) as Uint8Array
           break
         }
         case IOTypes.Image:
@@ -180,11 +182,12 @@ function runPipelineEmscripten(pipelineModule: PipelineEmscriptenModule, args: s
           const image = JSON.parse(imageJSON)
           const dataUint8 = readFileSharedArray(pipelineModule, image.data as string)
           image.data = bufferToTypedArray(image.imageType.componentType, dataUint8.buffer)
-          data = image as string
+          outputData = image as Image
           break
         }
         case IOTypes.Mesh:
         {
+          // debugger
           const meshJSON = pipelineModule.fs_readFile(output.path, { encoding: 'utf8' }) as string
           const mesh = JSON.parse(meshJSON)
           if (mesh.numberOfPoints) {
@@ -211,7 +214,7 @@ function runPipelineEmscripten(pipelineModule: PipelineEmscriptenModule, args: s
           } else {
             mesh.cellData = bufferToTypedArray(mesh.meshType.cellPixelComponentType, new ArrayBuffer(0))
           }
-          data = mesh as Mesh
+          outputData = mesh as Mesh
           break
         }
         case IOTypes.vtkPolyData:
@@ -245,7 +248,7 @@ function runPipelineEmscripten(pipelineModule: PipelineEmscriptenModule, args: s
               })
             }
           })
-          data = polyData as PolyData
+          outputData = polyData as PolyData
           break
         }
         default:
@@ -254,7 +257,7 @@ function runPipelineEmscripten(pipelineModule: PipelineEmscriptenModule, args: s
       const populatedOutput = {
         path: output.path,
         type: output.type,
-        data,
+        data: outputData,
       }
       populatedOutputs.push(populatedOutput)
     })
