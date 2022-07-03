@@ -1,0 +1,594 @@
+[package]
+name = "itk-image-io"
+version = "1.0.0-a.1"
+description = "Scientific image io with itk-wasm."
+license = "Apache-2.0"
+repository = "https://github.com/InsightSoftwareConsortium/itk-wasm.git"
+readme = "README.md"
+homepage = "https://wasm.itk.org"
+
+[[module]]
+name = "VTKImageIOReadImage"
+source = "VTKImageIOReadImage.wasi.wasm"
+abi = "wasi"
+
+[module.interfaces]
+wasi = "0.0.0-unstable"
+
+[[command]]
+name = "vtk-image-io-read-image"
+module = "VTKImageIOReadImage"
+
+
+[[module]]
+name = "VTKImageIOReadImage"
+source = "VTKImageIOReadImage.wasi.wasm"
+abi = "wasi"
+
+[module.interfaces]
+wasi = "0.0.0-unstable"
+
+[[command]]
+name = "vtk-image-io-read-image"
+module = "VTKImageIOReadImage"
+
+
+[[module]]
+name = "VTKImageIOReadImage"
+source = "VTKImageIOReadImage.wasi.wasm"
+abi = "wasi"
+
+[module.interfaces]
+wasi = "0.0.0-unstable"
+
+[[command]]
+name = "vtk-image-io-read-image"
+module = "VTKImageIOReadImage"
+
+
+[[module]]
+name = "VTKImageIOReadImage"
+source = "VTKImageIOReadImage.wasi.wasm"
+abi = "wasi"
+
+[module.interfaces]
+wasi = "0.0.0-unstable"
+
+[[command]]
+name = "vtk-image-io-read-image"
+module = "VTKImageIOReadImage"
+
+
+[[module]]
+name = "VTKImageIOReadImage"
+source = "VTKImageIOReadImage.wasi.wasm"
+abi = "wasi"
+
+[module.interfaces]
+wasi = "0.0.0-unstable"
+
+[[command]]
+name = "vtk-image-io-read-image"
+module = "VTKImageIOReadImage"
+
+
+[[module]]
+name = "VTKImageIOReadImage"
+source = "VTKImageIOReadImage.wasi.wasm"
+abi = "wasi"
+
+[module.interfaces]
+wasi = "0.0.0-unstable"
+
+[[command]]
+name = "vtk-image-io-read-image"
+module = "VTKImageIOReadImage"
+
+
+[[module]]
+name = "VTKImageIOReadImage"
+source = "VTKImageIOReadImage.wasi.wasm"
+abi = "wasi"
+
+[module.interfaces]
+wasi = "0.0.0-unstable"
+
+[[command]]
+name = "vtk-image-io-read-image"
+module = "VTKImageIOReadImage"
+
+
+[[module]]
+name = "VTKImageIOReadImage"
+source = "VTKImageIOReadImage.wasi.wasm"
+abi = "wasi"
+
+[module.interfaces]
+wasi = "0.0.0-unstable"
+
+[[command]]
+name = "vtk-image-io-read-image"
+module = "VTKImageIOReadImage"
+
+
+[[module]]
+name = "VTKImageIOReadImage"
+source = "VTKImageIOReadImage.wasi.wasm"
+abi = "wasi"
+
+[module.interfaces]
+wasi = "0.0.0-unstable"
+
+[[command]]
+name = "vtk-image-io-read-image"
+module = "VTKImageIOReadImage"
+
+
+[[module]]
+name = "VTKImageIOReadImage"
+source = "VTKImageIOReadImage.wasi.wasm"
+abi = "wasi"
+
+[module.interfaces]
+wasi = "0.0.0-unstable"
+
+[[command]]
+name = "vtk-image-io-read-image"
+module = "VTKImageIOReadImage"
+
+
+[[module]]
+name = "VTKImageIOReadImage"
+source = "VTKImageIOReadImage.wasi.wasm"
+abi = "wasi"
+
+[module.interfaces]
+wasi = "0.0.0-unstable"
+
+[[command]]
+name = "vtk-image-io-read-image"
+module = "VTKImageIOReadImage"
+
+
+[[module]]
+name = "VTKImageIOReadImage"
+source = "VTKImageIOReadImage.wasi.wasm"
+abi = "wasi"
+
+[module.interfaces]
+wasi = "0.0.0-unstable"
+
+[[command]]
+name = "vtk-image-io-read-image"
+module = "VTKImageIOReadImage"
+
+
+[[module]]
+name = "VTKImageIOReadImage"
+source = "VTKImageIOReadImage.wasi.wasm"
+abi = "wasi"
+
+[module.interfaces]
+wasi = "0.0.0-unstable"
+
+[[command]]
+name = "vtk-image-io-read-image"
+module = "VTKImageIOReadImage"
+
+
+[[module]]
+name = "VTKImageIOReadImage"
+source = "VTKImageIOReadImage.wasi.wasm"
+abi = "wasi"
+
+[module.interfaces]
+wasi = "0.0.0-unstable"
+
+[[command]]
+name = "vtk-image-io-read-image"
+module = "VTKImageIOReadImage"
+
+
+[[module]]
+name = "VTKImageIOReadImage"
+source = "VTKImageIOReadImage.wasi.wasm"
+abi = "wasi"
+
+[module.interfaces]
+wasi = "0.0.0-unstable"
+
+[[command]]
+name = "vtk-image-io-read-image"
+module = "VTKImageIOReadImage"
+
+
+[[module]]
+name = "VTKImageIOReadImage"
+source = "VTKImageIOReadImage.wasi.wasm"
+abi = "wasi"
+
+[module.interfaces]
+wasi = "0.0.0-unstable"
+
+[[command]]
+name = "vtk-image-io-read-image"
+module = "VTKImageIOReadImage"
+
+
+[[module]]
+name = "VTKImageIOReadImage"
+source = "VTKImageIOReadImage.wasi.wasm"
+abi = "wasi"
+
+[module.interfaces]
+wasi = "0.0.0-unstable"
+
+[[command]]
+name = "vtk-image-io-read-image"
+module = "VTKImageIOReadImage"
+
+
+[[module]]
+name = "VTKImageIOReadImage"
+source = "VTKImageIOReadImage.wasi.wasm"
+abi = "wasi"
+
+[module.interfaces]
+wasi = "0.0.0-unstable"
+
+[[command]]
+name = "vtk-image-io-read-image"
+module = "VTKImageIOReadImage"
+
+
+[[module]]
+name = "VTKImageIOReadImage"
+source = "VTKImageIOReadImage.wasi.wasm"
+abi = "wasi"
+
+[module.interfaces]
+wasi = "0.0.0-unstable"
+
+[[command]]
+name = "vtk-image-io-read-image"
+module = "VTKImageIOReadImage"
+
+
+[[module]]
+name = "VTKImageIOReadImage"
+source = "VTKImageIOReadImage.wasi.wasm"
+abi = "wasi"
+
+[module.interfaces]
+wasi = "0.0.0-unstable"
+
+[[command]]
+name = "vtk-image-io-read-image"
+module = "VTKImageIOReadImage"
+
+
+[[module]]
+name = "VTKImageIOReadImage"
+source = "VTKImageIOReadImage.wasi.wasm"
+abi = "wasi"
+
+[module.interfaces]
+wasi = "0.0.0-unstable"
+
+[[command]]
+name = "vtk-image-io-read-image"
+module = "VTKImageIOReadImage"
+
+
+[[module]]
+name = "VTKImageIOReadImage"
+source = "VTKImageIOReadImage.wasi.wasm"
+abi = "wasi"
+
+[module.interfaces]
+wasi = "0.0.0-unstable"
+
+[[command]]
+name = "vtk-image-io-read-image"
+module = "VTKImageIOReadImage"
+
+
+[[module]]
+name = "VTKImageIOReadImage"
+source = "VTKImageIOReadImage.wasi.wasm"
+abi = "wasi"
+
+[module.interfaces]
+wasi = "0.0.0-unstable"
+
+[[command]]
+name = "vtk-image-io-read-image"
+module = "VTKImageIOReadImage"
+
+
+[[module]]
+name = "VTKImageIOReadImage"
+source = "VTKImageIOReadImage.wasi.wasm"
+abi = "wasi"
+
+[module.interfaces]
+wasi = "0.0.0-unstable"
+
+[[command]]
+name = "vtk-image-io-read-image"
+module = "VTKImageIOReadImage"
+
+
+[[module]]
+name = "VTKImageIOReadImage"
+source = "VTKImageIOReadImage.wasi.wasm"
+abi = "wasi"
+
+[module.interfaces]
+wasi = "0.0.0-unstable"
+
+[[command]]
+name = "vtk-image-io-read-image"
+module = "VTKImageIOReadImage"
+
+
+[[module]]
+name = "VTKImageIOReadImage"
+source = "VTKImageIOReadImage.wasi.wasm"
+abi = "wasi"
+
+[module.interfaces]
+wasi = "0.0.0-unstable"
+
+[[command]]
+name = "vtk-image-io-read-image"
+module = "VTKImageIOReadImage"
+
+
+[[module]]
+name = "VTKImageIOReadImage"
+source = "VTKImageIOReadImage.wasi.wasm"
+abi = "wasi"
+
+[module.interfaces]
+wasi = "0.0.0-unstable"
+
+[[command]]
+name = "vtk-image-io-read-image"
+module = "VTKImageIOReadImage"
+
+
+[[module]]
+name = "VTKImageIOReadImage"
+source = "VTKImageIOReadImage.wasi.wasm"
+abi = "wasi"
+
+[module.interfaces]
+wasi = "0.0.0-unstable"
+
+[[command]]
+name = "vtk-image-io-read-image"
+module = "VTKImageIOReadImage"
+
+
+[[module]]
+name = "VTKImageIOReadImage"
+source = "VTKImageIOReadImage.wasi.wasm"
+abi = "wasi"
+
+[module.interfaces]
+wasi = "0.0.0-unstable"
+
+[[command]]
+name = "vtk-image-io-read-image"
+module = "VTKImageIOReadImage"
+
+
+[[module]]
+name = "VTKImageIOReadImage"
+source = "VTKImageIOReadImage.wasi.wasm"
+abi = "wasi"
+
+[module.interfaces]
+wasi = "0.0.0-unstable"
+
+[[command]]
+name = "vtk-image-io-read-image"
+module = "VTKImageIOReadImage"
+
+
+[[module]]
+name = "VTKImageIOReadImage"
+source = "VTKImageIOReadImage.wasi.wasm"
+abi = "wasi"
+
+[module.interfaces]
+wasi = "0.0.0-unstable"
+
+[[command]]
+name = "vtk-image-io-read-image"
+module = "VTKImageIOReadImage"
+
+
+[[module]]
+name = "VTKImageIOReadImage"
+source = "VTKImageIOReadImage.wasi.wasm"
+abi = "wasi"
+
+[module.interfaces]
+wasi = "0.0.0-unstable"
+
+[[command]]
+name = "vtk-image-io-read-image"
+module = "VTKImageIOReadImage"
+
+
+[[module]]
+name = "VTKImageIOReadImage"
+source = "VTKImageIOReadImage.wasi.wasm"
+abi = "wasi"
+
+[module.interfaces]
+wasi = "0.0.0-unstable"
+
+[[command]]
+name = "vtk-image-io-read-image"
+module = "VTKImageIOReadImage"
+
+
+[[module]]
+name = "VTKImageIOReadImage"
+source = "VTKImageIOReadImage.wasi.wasm"
+abi = "wasi"
+
+[module.interfaces]
+wasi = "0.0.0-unstable"
+
+[[command]]
+name = "vtk-image-io-read-image"
+module = "VTKImageIOReadImage"
+
+
+[[module]]
+name = "VTKImageIOReadImage"
+source = "VTKImageIOReadImage.wasi.wasm"
+abi = "wasi"
+
+[module.interfaces]
+wasi = "0.0.0-unstable"
+
+[[command]]
+name = "vtk-image-io-read-image"
+module = "VTKImageIOReadImage"
+
+
+[[module]]
+name = "VTKImageIOReadImage"
+source = "VTKImageIOReadImage.wasi.wasm"
+abi = "wasi"
+
+[module.interfaces]
+wasi = "0.0.0-unstable"
+
+[[command]]
+name = "vtk-image-io-read-image"
+module = "VTKImageIOReadImage"
+
+
+[[module]]
+name = "VTKImageIOReadImage"
+source = "VTKImageIOReadImage.wasi.wasm"
+abi = "wasi"
+
+[module.interfaces]
+wasi = "0.0.0-unstable"
+
+[[command]]
+name = "vtk-image-io-read-image"
+module = "VTKImageIOReadImage"
+
+
+[[module]]
+name = "VTKImageIOReadImage"
+source = "VTKImageIOReadImage.wasi.wasm"
+abi = "wasi"
+
+[module.interfaces]
+wasi = "0.0.0-unstable"
+
+[[command]]
+name = "vtk-image-io-read-image"
+module = "VTKImageIOReadImage"
+
+
+[[module]]
+name = "VTKImageIOReadImage"
+source = "VTKImageIOReadImage.wasi.wasm"
+abi = "wasi"
+
+[module.interfaces]
+wasi = "0.0.0-unstable"
+
+[[command]]
+name = "vtk-image-io-read-image"
+module = "VTKImageIOReadImage"
+
+
+[[module]]
+name = "VTKImageIOReadImage"
+source = "VTKImageIOReadImage.wasi.wasm"
+abi = "wasi"
+
+[module.interfaces]
+wasi = "0.0.0-unstable"
+
+[[command]]
+name = "vtk-image-io-read-image"
+module = "VTKImageIOReadImage"
+
+
+[[module]]
+name = "VTKImageIOReadImage"
+source = "VTKImageIOReadImage.wasi.wasm"
+abi = "wasi"
+
+[module.interfaces]
+wasi = "0.0.0-unstable"
+
+[[command]]
+name = "vtk-image-io-read-image"
+module = "VTKImageIOReadImage"
+
+
+[[module]]
+name = "VTKImageIOReadImage"
+source = "VTKImageIOReadImage.wasi.wasm"
+abi = "wasi"
+
+[module.interfaces]
+wasi = "0.0.0-unstable"
+
+[[command]]
+name = "vtk-image-io-read-image"
+module = "VTKImageIOReadImage"
+
+
+[[module]]
+name = "VTKImageIOReadImage"
+source = "VTKImageIOReadImage.wasi.wasm"
+abi = "wasi"
+
+[module.interfaces]
+wasi = "0.0.0-unstable"
+
+[[command]]
+name = "vtk-image-io-read-image"
+module = "VTKImageIOReadImage"
+
+
+[[module]]
+name = "VTKImageIOReadImage"
+source = "VTKImageIOReadImage.wasi.wasm"
+abi = "wasi"
+
+[module.interfaces]
+wasi = "0.0.0-unstable"
+
+[[command]]
+name = "vtk-image-io-read-image"
+module = "VTKImageIOReadImage"
+
+
+[[module]]
+name = "VTKImageIOReadImage"
+source = "VTKImageIOReadImage.wasi.wasm"
+abi = "wasi"
+
+[module.interfaces]
+wasi = "0.0.0-unstable"
+
+[[command]]
+name = "vtk-image-io-read-image"
+module = "VTKImageIOReadImage"
+
+
