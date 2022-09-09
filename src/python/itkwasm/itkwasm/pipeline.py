@@ -1,9 +1,44 @@
 from pathlib import Path
-from typing import List, Union
+from typing import List, Union, Optional
+from enum import Enum
+from dataclasses import dataclass
 
 from wasmer import engine, wasi, Store, Module, ImportObject, Instance
 from wasmer_compiler_cranelift import Compiler
 
+from .image import Image
+from .mesh import Mesh
+
+class InterfaceTypes(Enum):
+    TextFile = 'InterfaceTextFile'
+    BinaryFile = 'InterfaceBinaryFile'
+    TextStream = 'InterfaceTextStream'
+    BinaryStream = 'InterfaceBinaryStream'
+    Image = 'InterfaceImage'
+    Mesh = 'InterfaceMesh'
+    PolyData = 'InterfacePolyData'
+
+@dataclass
+class TextFile:
+    path: str
+
+@dataclass
+class BinaryFile:
+    path: str
+
+@dataclass
+class TextStream:
+    data: str
+
+@dataclass
+class BinaryStream:
+    data: bytes
+
+@dataclass
+class PipelineInput:
+    type: InterfaceTypes
+    data: Union[str, bytes, Image, Mesh, TextFile, BinaryFile, TextStream, BinaryStream]
+    path: Optional[str] = None
 
 class Pipeline:
     """Run an itk-wasm WASI pipeline."""
@@ -32,6 +67,10 @@ class Pipeline:
         import_object = wasi_env.generate_import_object(self.store, self.wasi_version)
 
         instance = Instance(self.module, import_object)
+
+        for input_ in inputs:
+            if input_['type'] is InterfaceTypes.TextFile:
+                data_array = input_['data']
 
         start = instance.exports._start
         start()

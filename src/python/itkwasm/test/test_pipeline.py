@@ -15,3 +15,6 @@ def test_pipeline_bytes():
         wasm_bytes = fp.read()
     pipeline = Pipeline(wasm_bytes)
     pipeline.run([])
+
+def test_mesh_read_write():
+    pipeline = Pipeline(test_input_dir / 'mesh-read-write-test.wasi.wasm')
