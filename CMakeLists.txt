@@ -30,6 +30,10 @@ include(FetchContent)
 set(_itk_build_testing ${BUILD_TESTING})
 set(BUILD_TESTING OFF)
 set(_itk_build_shared ${BUILD_SHARED_LIBS})
+set(BUILD_SHARED_LIBS OFF)
+if(NOT DEFINED CMAKE_POSITION_INDEPENDENT_CODE)
+  set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+endif()
 
 # Uses newer CMake
 set(RapidJSON_GIT_REPOSITORY "https://github.com/thewtex/rapidjson.git")
@@ -46,8 +50,8 @@ FetchContent_Declare(
   )
 
 set(CLI11_GIT_REPOSITORY "https://github.com/CLIUtils/CLI11")
-set(CLI11_GIT_REPOSITORY "https://github.com/thewtex/CLI11")
-set(CLI11_GIT_TAG "bdbf4f5432d3203adbf7284331dd4ee173b68768")
+# v2.3.2
+set(CLI11_GIT_TAG "291c58789c031208f08f4f261a858b5b7083e8e2")
 FetchContent_Declare(
   cli11
   GIT_REPOSITORY ${CLI11_GIT_REPOSITORY}
@@ -66,8 +70,8 @@ FetchContent_Declare(
 
 set(libcbor_GIT_REPOSITORY "https://github.com/PJK/libcbor")
 set(libcbor_GIT_REPOSITORY "https://github.com/thewtex/libcbor")
-# v0.9.0 + CMake + WASI + target_include_directory
-set(libcbor_GIT_TAG "e0b3f9284ea96a961db813514ae1d08f8dc2fa56")
+# 2022-12-17 master + CMake + WASI + target_include_directory + GCC | operator warning
+set(libcbor_GIT_TAG "702568cd2d60f3b9fb2d491c274ab03b8c1b1bf9")
 FetchContent_Declare(
   libcbor
   GIT_REPOSITORY ${libcbor_GIT_REPOSITORY}
@@ -93,6 +97,7 @@ set(rang_INCLUDE_DIR "${rang_SOURCE_DIR}/include")
 set(libcbor_INCLUDE_DIR "${libcbor_SOURCE_DIR}/src")
 set(libcbor_EXPORT_DIR "${libcbor_BINARY_DIR}/src")
 set(libcbor_CONFIGURATION_DIR "${libcbor_BINARY_DIR}/")
+set(cpp_base64_INCLUDE_DIR "${cpp_base64_SOURCE_DIR}/include")
 
 set(BUILD_TESTING ${_itk_build_testing})
 set(BUILD_SHARED_LIBS ${_itk_build_shared})
@@ -107,8 +112,9 @@ set(WebAssemblyInterface_INCLUDE_DIRS
   ${libcbor_INCLUDE_DIR}
   ${libcbor_EXPORT_DIR}
   ${libcbor_CONFIGURATION_DIR}
+  ${cpp_base64_INCLUDE_DIR}
   )
-list(APPEND WebAssemblyInterface_LIBRARIES cbor)
+list(APPEND WebAssemblyInterface_LIBRARIES cbor cpp-base64)
 
 get_filename_component(_module_dir "${CMAKE_CURRENT_LIST_FILE}" PATH)
 set(CMAKE_MODULE_PATH "${_module_dir}/CMake/" ${CMAKE_MODULE_PATH})
@@ -124,3 +130,6 @@ endif()
 itk_module_target_label(cbor)
 itk_module_target_export(cbor)
 itk_module_target_install(cbor)
+itk_module_target_label(cpp-base64)
+itk_module_target_export(cpp-base64)
+itk_module_target_install(cpp-base64)

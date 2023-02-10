@@ -1,10 +1,7 @@
-import itkConfig from "../../../src/itkConfigDevServer"
-
 describe('runPipeline', () => {
   beforeEach(() => {
     cy.visit('/')
   })
-
 
   it('captures stdout and stderr', () => {
     cy.window().then(async (win) => {
@@ -19,8 +16,7 @@ describe('runPipeline', () => {
     })
   })
 
-
-  it('fetches WASM files from a custom config URL', () => {
+  it('fetches Wasm files from a custom config URL', () => {
     cy.window().then(async (win) => {
       const itk = win.itk
       const configPropertyPipelinesBaseUrl = 'customPipelinesUrl' 
@@ -30,10 +26,49 @@ describe('runPipeline', () => {
       const outputs = null
       const inputs = null
       const stdoutStderrPath = 'stdout-stderr-test'
-      const { webWorker, returnValue, stdout, stderr } = await itk.runPipeline(null, stdoutStderrPath, args, outputs, inputs, configPropertyPipelinesBaseUrl)
+      const { webWorker, returnValue, stdout, stderr } = await itk.runPipeline(null, stdoutStderrPath, args, outputs, inputs, { pipelineBaseUrl: configPropertyPipelinesBaseUrl })
     })
   })
 
+  it('fetches Wasm files from a custom pipelineBaseUrl URL', () => {
+    cy.window().then(async (win) => {
+      const itk = win.itk
+      const pipelineBaseUrl = new URL('/pipelines', document.location.origin)
+
+      const args = []
+      const outputs = null
+      const inputs = null
+      const stdoutStderrPath = 'stdout-stderr-test'
+      const { webWorker, returnValue, stdout, stderr } = await itk.runPipeline(null, stdoutStderrPath, args, outputs, inputs, { pipelineBaseUrl })
+    })
+  })
+
+  it('fetches Wasm files from a custom pipelineBaseUrl string', () => {
+    cy.window().then(async (win) => {
+      const itk = win.itk
+      const pipelineBaseUrl = '/pipelines'
+
+      const args = []
+      const outputs = null
+      const inputs = null
+      const stdoutStderrPath = 'stdout-stderr-test'
+      const { webWorker, returnValue, stdout, stderr } = await itk.runPipeline(null, stdoutStderrPath, args, outputs, inputs, { pipelineBaseUrl })
+    })
+  })
+
+  it('fetches Wasm files from a custom pipelineWorkerUrl string', () => {
+    cy.window().then(async (win) => {
+      const itk = win.itk
+      const pipelineBaseUrl = '/pipelines'
+      const pipelineWorkerUrl = '/web-workers/bundles/pipeline.worker.js'
+
+      const args = []
+      const outputs = null
+      const inputs = null
+      const stdoutStderrPath = 'stdout-stderr-test'
+      const { webWorker, returnValue, stdout, stderr } = await itk.runPipeline(null, stdoutStderrPath, args, outputs, inputs, { pipelineBaseUrl, pipelineWorkerUrl })
+    })
+  })
 
   it('re-uses a WebWorker', () => {
     cy.window().then(async (win) => {

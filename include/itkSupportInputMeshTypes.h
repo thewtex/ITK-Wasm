@@ -18,15 +18,16 @@
 #ifndef itkSupportInputMeshTypes_h
 #define itkSupportInputMeshTypes_h
 #include "itkPipeline.h"
-#include "itkWASMPixelTypeFromIOPixelEnum.h"
-#include "itkWASMComponentTypeFromIOComponentEnum.h"
+#include "itkWasmPixelTypeFromIOPixelEnum.h"
+#include "itkWasmComponentTypeFromIOComponentEnum.h"
 #include "itkMeshConvertPixelTraits.h"
-#include "itkWASMMapComponentType.h"
-#include "itkWASMMapPixelType.h"
+#include "itkWasmMapComponentType.h"
+#include "itkWasmMapPixelType.h"
 
 #include "itkMesh.h"
 #include "itkMeshIOBase.h"
 #include "itkMeshIOFactory.h"
+#include "WebAssemblyInterfaceExport.h"
 
 namespace itk
 {
@@ -42,7 +43,7 @@ struct InterfaceMeshType
   unsigned int components{1};
 };
 
-bool lexical_cast(const std::string &input, InterfaceMeshType & meshType);
+WebAssemblyInterface_EXPORT bool lexical_cast(const std::string &input, InterfaceMeshType & meshType);
 
 /** \class SupportInputMeshTypes
  *

@@ -18,17 +18,18 @@
 #ifndef itkSupportInputImageTypes_h
 #define itkSupportInputImageTypes_h
 #include "itkPipeline.h"
-#include "itkWASMPixelTypeFromIOPixelEnum.h"
-#include "itkWASMComponentTypeFromIOComponentEnum.h"
+#include "itkWasmPixelTypeFromIOPixelEnum.h"
+#include "itkWasmComponentTypeFromIOComponentEnum.h"
 #include "itkDefaultConvertPixelTraits.h"
-#include "itkWASMMapComponentType.h"
-#include "itkWASMMapPixelType.h"
+#include "itkWasmMapComponentType.h"
+#include "itkWasmMapPixelType.h"
 
 #include "itkImage.h"
 #include "itkVectorImage.h"
 #include "itkImageIOBase.h"
 #include "itkImageIOFactory.h"
 #include "itkSpecializedImagePipelineFunctor.h"
+#include "WebAssemblyInterfaceExport.h"
 
 namespace itk
 {
@@ -44,7 +45,7 @@ struct InterfaceImageType
   unsigned int components{1};
 };
 
-bool lexical_cast(const std::string &input, InterfaceImageType & imageType);
+WebAssemblyInterface_EXPORT bool lexical_cast(const std::string &input, InterfaceImageType & imageType);
 
 /** \class SupportInputImageTypes
  *

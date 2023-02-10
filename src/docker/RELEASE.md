@@ -3,9 +3,10 @@
 Verify the source tree.
 
 ```
-git checkout master
-git pull upstream master
+git checkout main
+git pull upstream main
 git clean -fdx
+git checkout -b docker-bump
 npm ci
 
 # Update the `defaultImageTag` in src/itk-wasm-cli.js

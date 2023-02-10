@@ -19,11 +19,13 @@
 #define itkInputTextStream_h
 
 #include "itkPipeline.h"
-#include "itkWASMStringStream.h"
+#include "itkWasmStringStream.h"
 
 #include <string>
 #include <sstream>
 #include <fstream>
+
+#include "WebAssemblyInterfaceExport.h"
 
 namespace itk
 {
@@ -40,7 +42,7 @@ namespace wasm
  *
  * \ingroup WebAssemblyInterface
  */
-class InputTextStream
+class WebAssemblyInterface_EXPORT InputTextStream
 {
 public:
   std::istream & Get() {
@@ -58,10 +60,10 @@ public:
       delete m_IStream;
     }
     m_DeleteIStream = false;
-    m_WASMStringStream = WASMStringStream::New();
-    m_WASMStringStream->SetJSON(json.c_str());
+    m_WasmStringStream = WasmStringStream::New();
+    m_WasmStringStream->SetJSON(json.c_str());
 
-    m_IStream = &(m_WASMStringStream->GetStringStream());
+    m_IStream = &(m_WasmStringStream->GetStringStream());
   }
 
   void SetFileName(const std::string & fileName)
@@ -86,11 +88,11 @@ protected:
   std::istream * m_IStream{nullptr};
   bool m_DeleteIStream{false};
 
-  WASMStringStream::Pointer m_WASMStringStream;
+  WasmStringStream::Pointer m_WasmStringStream;
 };
 
 
-bool lexical_cast(const std::string &input, InputTextStream &inputStream);
+WebAssemblyInterface_EXPORT bool lexical_cast(const std::string &input, InputTextStream &inputStream);
 
 } // end namespace wasm
 } // end namespace itk

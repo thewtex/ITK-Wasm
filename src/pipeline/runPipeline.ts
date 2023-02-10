@@ -1,4 +1,4 @@
-import createWebWorkerPromise from '../core/internal/createWebWorkerPromise.js'
+import createWebWorkerPromise from '../core/createWebWorkerPromise.js'
 import loadEmscriptenModuleMainThread from '../core/internal/loadEmscriptenModuleMainThread.js'
 
 import config from '../itkConfig.js'
@@ -16,34 +16,51 @@ import PipelineEmscriptenModule from './PipelineEmscriptenModule.js'
 import PipelineOutput from './PipelineOutput.js'
 import PipelineInput from './PipelineInput.js'
 import RunPipelineResult from './RunPipelineResult.js'
+import RunPipelineOptions from './RunPipelineOptions.js'
 
 // To cache loaded pipeline modules
 const pipelineToModule: Map<string, PipelineEmscriptenModule> = new Map()
 
-async function loadPipelineModule (pipelinePath: string | URL): Promise<PipelineEmscriptenModule> {
+async function loadPipelineModule (
+  pipelinePath: string | URL
+): Promise<PipelineEmscriptenModule> {
   let moduleRelativePathOrURL: string | URL = pipelinePath as string
   let pipeline = pipelinePath as string
   if (typeof pipelinePath !== 'string') {
-    moduleRelativePathOrURL = new URL((pipelinePath).href)
+    moduleRelativePathOrURL = new URL(pipelinePath.href)
     pipeline = moduleRelativePathOrURL.href
   }
   if (pipelineToModule.has(pipeline)) {
     return pipelineToModule.get(pipeline) as PipelineEmscriptenModule
   } else {
-    const pipelineModule = await loadEmscriptenModuleMainThread(pipelinePath, config.pipelinesUrl) as PipelineEmscriptenModule
+    const pipelineModule = (await loadEmscriptenModuleMainThread(
+      pipelinePath,
+      config.pipelinesUrl
+    )) as PipelineEmscriptenModule
     pipelineToModule.set(pipeline, pipelineModule)
     return pipelineModule
   }
 }
 
-async function runPipeline (webWorker: Worker | null | boolean, pipelinePath: string | URL, args: string[], outputs: PipelineOutput[] | null, inputs: PipelineInput[] | null, configPropertyPipelineBaseUrl: string | URL = 'pipelinesUrl'): Promise<RunPipelineResult> {
+async function runPipeline (
+  webWorker: Worker | null | boolean,
+  pipelinePath: string | URL,
+  args: string[],
+  outputs: PipelineOutput[] | null,
+  inputs: PipelineInput[] | null,
+  options?: RunPipelineOptions
+): Promise<RunPipelineResult> {
   if (webWorker === false) {
     const pipelineModule = await loadPipelineModule(pipelinePath.toString())
     const result = runPipelineEmscripten(pipelineModule, args, outputs, inputs)
     return result
   }
   let worker = webWorker
-  const { webworkerPromise, worker: usedWorker } = await createWebWorkerPromise(worker as Worker | null)
+  const pipelineWorkerUrl = options?.pipelineWorkerUrl
+  const pipelineWorkerUrlString = typeof pipelineWorkerUrl !== 'string' && typeof pipelineWorkerUrl?.href !== 'undefined' ? pipelineWorkerUrl.href : pipelineWorkerUrl
+  const { webworkerPromise, worker: usedWorker } = await createWebWorkerPromise(
+    worker as Worker | null, pipelineWorkerUrlString as string | undefined | null
+  )
   worker = usedWorker
   const transferables: ArrayBuffer[] = []
   if (!(inputs == null) && inputs.length > 0) {
@@ -132,19 +149,27 @@ async function runPipeline (webWorker: Worker | null | boolean, pipelinePath: st
     stderr: string
     outputs: PipelineOutput[]
   }
+  const pipelineBaseUrl = options?.pipelineBaseUrl ?? 'pipelinesUrl'
+  const pipelineBaseUrlString = typeof pipelineBaseUrl !== 'string' && typeof pipelineBaseUrl?.href !== 'undefined' ? pipelineBaseUrl.href : pipelineBaseUrl
   const result: RunPipelineWorkerResult = await webworkerPromise.postMessage(
     {
       operation: 'runPipeline',
       config: config,
       pipelinePath: pipelinePath.toString(),
-      configPropertyPipelineBaseUrl,
+      pipelineBaseUrl: pipelineBaseUrlString,
       args,
       outputs,
       inputs
     },
     transferables
   )
-  return { returnValue: result.returnValue, stdout: result.stdout, stderr: result.stderr, outputs: result.outputs, webWorker: worker }
+  return {
+    returnValue: result.returnValue,
+    stdout: result.stdout,
+    stderr: result.stderr,
+    outputs: result.outputs,
+    webWorker: worker
+  }
 }
 
 export default runPipeline

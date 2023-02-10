@@ -19,7 +19,7 @@
 #define itkOutputTextStream_h
 
 #include "itkPipeline.h"
-#include "itkWASMStringStream.h"
+#include "itkWasmStringStream.h"
 
 #include <string>
 #ifndef ITK_WASM_NO_MEMORY_IO
@@ -28,6 +28,8 @@
 #ifndef ITK_WASM_NO_FILESYSTEM_IO
 #include <fstream>
 #endif
+
+#include "WebAssemblyInterfaceExport.h"
 
 namespace itk
 {
@@ -44,7 +46,7 @@ namespace wasm
  * 
  * \ingroup WebAssemblyInterface
  */
-class OutputTextStream
+class WebAssemblyInterface_EXPORT OutputTextStream
 {
 public:
   std::ostream & Get() {
@@ -72,9 +74,9 @@ public:
       delete m_OStream;
     }
     m_DeleteOStream = false;
-    m_WASMStringStream = WASMStringStream::New();
+    m_WasmStringStream = WasmStringStream::New();
 
-    m_OStream = &(m_WASMStringStream->GetStringStream());
+    m_OStream = &(m_WasmStringStream->GetStringStream());
     this->m_Identifier = identifier;
   }
   const std::string & GetIdentifier() const
@@ -88,11 +90,11 @@ protected:
 
   std::string m_Identifier;
 
-  WASMStringStream::Pointer m_WASMStringStream;
+  WasmStringStream::Pointer m_WasmStringStream;
 };
 
 
-bool lexical_cast(const std::string &output, OutputTextStream &outputStream);
+WebAssemblyInterface_EXPORT bool lexical_cast(const std::string &output, OutputTextStream &outputStream);
 
 } // end namespace wasm
 } // end namespace itk
