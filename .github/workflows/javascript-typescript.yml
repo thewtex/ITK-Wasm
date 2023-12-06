@@ -22,19 +22,20 @@ jobs:
 
     - name: Install packages
       run: |
-        npm ci
+        npm i -g pnpm
+        pnpm i
 
     - name: Build
       run: |
-        npm run build
+        pnpm run --aggregate-output build
 
     - name: Lint tests
       run: |
-        npm run test:lint
+        pnpm run test:lint
 
     - name: Node tests
       run: |
-        npm run test:node
+        pnpm run --aggregate-output test:node
 
     - name: Browser tests
       run: |
@@ -43,18 +44,6 @@ jobs:
         # To debug locally, run `./test/run.sh -d`
         ./test/run.sh
 
-    - name: Test building a pipeline
-      run: |
-        cd test/pipelines/median-filter-pipeline
-
-        node ../../../src/itk-wasm-cli.js build -i itkwasm/emscripten:latest .
-        rm -rf emscripten-build
-
-        node ../../../src/itk-wasm-cli.js build -i itkwasm/wasi:latest .
-        rm -rf emscripten-build
-
-        cd -
-
     - name: Publish task
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -62,4 +51,4 @@ jobs:
       run: |
         git config --global user.name "GitHub Actions"
         git config --global user.email "itk+community@discourse.itk.org"
-        npx semantic-release
+        # todo: use changeset / pnpm publish

@@ -1,4 +1,4 @@
-name: Cypress Tests
+name: Browser Tests
 
 on: [push,pull_request]
 
@@ -23,17 +23,18 @@ jobs:
 
       - name: Install
         run: |
-          npm ci
+          npm i -g pnpm
+          pnpm install
 
       - name: Build
         run: |
-          npm run build
+          pnpm run --aggregate-output build
 
       - name: Test with Chrome
         uses: cypress-io/github-action@v6
         with:
           browser: chrome
-          command: npm run test:chrome
+          command: pnpm run --sequential test:browser:chrome
 
       - uses: actions/upload-artifact@v3
         if: failure()

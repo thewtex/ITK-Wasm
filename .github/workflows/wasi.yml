@@ -22,16 +22,13 @@ jobs:
 
     - name: Install packages
       run: |
-        npm ci
+        npm i -g pnpm
+        pnpm i
 
     - name: Build
       run: |
-        npm run build:wasi
+        pnpm run --aggregate-output build:wasi
 
     - name: Test
       run: |
-        npm run test:wasi
-
-    - name: Build WASI packages
-      run: |
-        npm run build:wasi:packages
+        pnpm run --aggregate-output test:wasi
