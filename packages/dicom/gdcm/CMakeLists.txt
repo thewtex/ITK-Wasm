@@ -48,7 +48,7 @@ if(${CMAKE_VERSION} VERSION_LESS 3.24)
 else()
   set(download_extract_timestamp_flag
     DOWNLOAD_EXTRACT_TIMESTAMP TRUE)
- endif()
+endif()
 
 ExternalProject_Add(${Iconv_LIBRARY}
   PREFIX ${Iconv_DIR}
