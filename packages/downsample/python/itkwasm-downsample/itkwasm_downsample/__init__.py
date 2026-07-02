@@ -12,5 +12,7 @@ from .downsample_async import downsample_async
 from .downsample import downsample
 from .gaussian_kernel_radius_async import gaussian_kernel_radius_async
 from .gaussian_kernel_radius import gaussian_kernel_radius
+from .resample_async import resample_async
+from .resample import resample
 
 from ._version import __version__
