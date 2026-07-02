@@ -13,6 +13,8 @@ elseif(WASI)
 else()
   set(io_components
     ITKImageIO
+    ITKIOTransformInsightLegacy
+    ITKIOTransformHDF5
     )
 endif()
 
@@ -21,12 +23,14 @@ find_package(ITK REQUIRED
    WebAssemblyInterface
    ITKSmoothing
    ITKImageGrid
+   ITKImageFunction
+   ITKTransform
    GenericLabelInterpolator
    ${io_components}
  )
 include(${ITK_USE_FILE})
 
-foreach(pipeline downsample downsample-sigma gaussian-kernel-radius downsample-bin-shrink downsample-label-image)
+foreach(pipeline downsample downsample-sigma gaussian-kernel-radius downsample-bin-shrink downsample-label-image resample)
   add_executable(${pipeline} ${pipeline}.cxx)
   target_link_libraries(${pipeline} PUBLIC ${ITK_LIBRARIES})
   target_include_directories(${pipeline} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
@@ -68,4 +72,15 @@ add_test(NAME downsample-label-image
     ${CMAKE_CURRENT_SOURCE_DIR}/test/data/input/2th_cthead1.png
     ${CMAKE_CURRENT_BINARY_DIR}/cthead1_downsampled_label_image.png
     --shrink-factors 2 2
+    )
+
+# Self-contained smoke test: use cthead1.png as both the moving image and the
+# reference geometry with the default identity transform, so the resampled
+# output closely matches the input. Needs no new test data.
+add_test(NAME resample
+  COMMAND resample
+    ${CMAKE_CURRENT_SOURCE_DIR}/test/data/input/cthead1.png
+    ${CMAKE_CURRENT_SOURCE_DIR}/test/data/input/cthead1.png
+    ${CMAKE_CURRENT_BINARY_DIR}/cthead1_resampled.png
+    --interpolator linear
     )
