@@ -28,6 +28,7 @@ export default defineConfig({
         { src: '../../../dist/pipelines/*', dest: 'pipelines' },
         { src: '../../../node_modules/@itk-wasm/image-io/dist/pipelines/*.{js,wasm,wasm.zst}', dest: 'pipelines' },
         { src: '../../../node_modules/@itk-wasm/mesh-io/dist/pipelines/*.{js,wasm,wasm.zst}', dest: 'pipelines' },
+        { src: '../../../node_modules/@itk-wasm/transform-io/dist/pipelines/*.{js,wasm,wasm.zst}', dest: 'pipelines' },
       ],
     })
   ],

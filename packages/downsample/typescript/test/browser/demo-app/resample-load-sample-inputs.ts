@@ -1,28 +1,51 @@
-// Generated file. To retain edits, remove this comment.
+export default async function resampleLoadSampleInputs(model, preRun = false) {
+  const resampleButton = document.querySelector(
+    "#resampleInputs sl-button[name=input-file-button]",
+  );
+  if (!preRun) {
+    resampleButton.loading = true;
+  }
 
-export default null
-// export default async function resampleLoadSampleInputs (model, preRun=false) {
+  const fileName = "cthead1.png";
+  const response = await fetch(
+    `https://bafybeih4fck4ndvsvgo6774xy5w7ip3bzcvh7x7e527m4yvazgrxdzayua.ipfs.w3s.link/ipfs/bafybeih4fck4ndvsvgo6774xy5w7ip3bzcvh7x7e527m4yvazgrxdzayua/input/${fileName}`,
+  );
+  const data = new Uint8Array(await response.arrayBuffer());
+  const inputFile = { data, path: fileName };
+  const { image } = await globalThis.readImage(inputFile);
 
-  // Load sample inputs for the resample function.
-  //
-  // This function should load sample inputs:
-  //
-  //  1) In the provided model map.
-  //  2) Into the corresponding HTML input elements if preRun is not true.
-  //
-  // Example for an input named `exampleInput`:
+  // Sample: resample cthead1 onto its own grid (identity transform, linear
+  // interpolation). The moving image doubles as the reference image, so the
+  // sample is self-contained from the single published input and produces an
+  // output essentially equal to the input. The transform is optional and left
+  // unset (defaults to identity); upload one via the demo to exercise that path.
+  model.inputs.set("input", image);
+  model.inputs.set("referenceImage", image);
+  model.options.set("interpolator", "linear");
 
-  // const exampleInput = 5
-  // model.inputs.set("exampleInput", exampleInput)
-  // if (!preRun) {
-  //   const exampleElement = document.querySelector("#resampleInputs [name=example-input]")
-  //   exampleElement.value = 5
-  // }
+  if (!preRun) {
+    const inputDetails = document.getElementById("resample-input-details");
+    inputDetails.setImage(image);
+    inputDetails.disabled = false;
 
-  // return model
-// }
+    const referenceDetails = document.getElementById(
+      "resample-reference-image-details",
+    );
+    referenceDetails.setImage(image);
+    referenceDetails.disabled = false;
+
+    const interpolatorElement = document.querySelector(
+      "#resampleInputs sl-input[name=interpolator]",
+    );
+    interpolatorElement.value = model.options.get("interpolator");
+
+    resampleButton.loading = false;
+  }
+
+  return model;
+}
 
 // Use this function to run the pipeline when this tab group is select.
 // This will load the web worker if it is not already loaded, download the wasm module, and allocate memory in the wasm model.
 // Set this to `false` if sample inputs are very large or sample pipeline computation is long.
-export const usePreRun = true
+export const usePreRun = true;
