@@ -22,9 +22,18 @@
 #include "itkOutputImage.h"
 #include "itkSupportInputImageTypes.h"
 
+#include "itkImage.h"
+#include "itkImageBase.h"
+#include "itkVectorImage.h"
+#include "itkVariableLengthVector.h"
+
 #include "itkResampleImageFilter.h"
 #include "itkTransform.h"
 #include "itkAffineTransform.h"
+
+// Per-component extract/compose for the itk::VectorImage specialization.
+#include "itkVectorIndexSelectionCastImageFilter.h"
+#include "itkComposeImageFilter.h"
 
 #include "itkInterpolateImageFunction.h"
 #include "itkLinearInterpolateImageFunction.h"
@@ -35,6 +44,7 @@
 #include "itkLabelImageGenericInterpolateImageFunction.h"
 
 #include <string>
+#include <vector>
 
 namespace
 {
@@ -83,6 +93,44 @@ SelectInterpolator(const std::string & interpolator)
     selected = itk::LinearInterpolateImageFunction<ImageType, double>::New();
   }
   return selected;
+}
+
+// Shared resample wiring used by both the scalar pipeline and each component of
+// the vector pipeline, so the reference-geometry / transform / interpolator
+// setup lives in exactly one place.
+//
+// Builds an itk::ResampleImageFilter<TImage, TImage> that maps `movingImage`
+// onto the reference image's geometry (origin, spacing, direction, size, start
+// index) using the selected interpolator and, when provided, the optional
+// transform (otherwise the filter's default identity transform is kept). The
+// reference is taken as an itk::ImageBase pointer because the filter reads only
+// its geometry -- this lets the vector path pass the moving VectorImage's own
+// geometry to each single-component (itk::Image) resample. The filter is
+// returned un-executed so the caller controls when it updates (the vector path
+// defers to a single ComposeImageFilter update across all components).
+template <typename TImage>
+typename itk::ResampleImageFilter<TImage, TImage>::Pointer
+MakeResampleFilter(const TImage *                                                                   movingImage,
+                   const itk::ImageBase<TImage::ImageDimension> *                                   referenceGeometry,
+                   const itk::Transform<double, TImage::ImageDimension, TImage::ImageDimension> * transform,
+                   const std::string &                                                              interpolator)
+{
+  using ImageType = TImage;
+  using ResampleFilterType = itk::ResampleImageFilter<ImageType, ImageType>;
+
+  auto resampleFilter = ResampleFilterType::New();
+  resampleFilter->SetInput(movingImage);
+  resampleFilter->SetReferenceImage(referenceGeometry);
+  resampleFilter->UseReferenceImageOn();
+  resampleFilter->SetInterpolator(SelectInterpolator<ImageType>(interpolator));
+
+  // Only override the filter's default identity transform when one was provided.
+  if (transform != nullptr)
+  {
+    resampleFilter->SetTransform(transform);
+  }
+
+  return resampleFilter;
 }
 
 } // namespace
@@ -142,23 +190,114 @@ public:
 
     typename ImageType::ConstPointer movingImage = inputImage.Get();
     typename ImageType::ConstPointer referenceGeometry = referenceImage.Get();
+    const TransformType *            transform = inputTransform.Get();
 
-    using ResampleFilterType = itk::ResampleImageFilter<ImageType, ImageType>;
-    auto resampleFilter = ResampleFilterType::New();
-    resampleFilter->SetInput(movingImage);
-    resampleFilter->SetReferenceImage(referenceGeometry);
-    resampleFilter->UseReferenceImageOn();
-    resampleFilter->SetInterpolator(SelectInterpolator<ImageType>(interpolator));
-
-    // Only override the filter's default identity transform when one was provided.
-    if (const TransformType * transform = inputTransform.Get(); transform != nullptr)
-    {
-      resampleFilter->SetTransform(transform);
-    }
+    // Shared reference-geometry / transform / interpolator wiring.
+    auto resampleFilter =
+      MakeResampleFilter<ImageType>(movingImage.GetPointer(), referenceGeometry.GetPointer(), transform, interpolator);
 
     ITK_WASM_CATCH_EXCEPTION(pipeline, resampleFilter->UpdateLargestPossibleRegion());
 
     typename ImageType::ConstPointer result = resampleFilter->GetOutput();
+    outputImage.Set(result);
+
+    return EXIT_SUCCESS;
+  }
+};
+
+// Specialization for itk::VectorImage (multi-component) pixel types.
+//
+// itk::ResampleImageFilter has no native multi-component path, so -- mirroring
+// downsample.cxx -- each component is extracted to a scalar image, resampled
+// independently through the shared MakeResampleFilter wiring, then recomposed.
+// Every interpolator therefore works with vector pixels.
+template <typename TPixel, unsigned int VDimension>
+class PipelineFunctor<itk::VectorImage<TPixel, VDimension>>
+{
+public:
+  int
+  operator()(itk::wasm::Pipeline & pipeline)
+  {
+    constexpr unsigned int Dimension = VDimension;
+    using PixelType = TPixel;
+    using VectorImageType = itk::VectorImage<PixelType, Dimension>;
+    using ScalarImageType = itk::Image<PixelType, Dimension>;
+
+    // Same option surface, order, and type_names as the scalar path so the
+    // bindings stay uniform across pixel types.
+    using InputImageType = itk::wasm::InputImage<VectorImageType>;
+    InputImageType inputImage;
+    pipeline.add_option("input", inputImage, "The moving image to resample.")->required()->type_name("INPUT_IMAGE");
+
+    InputImageType referenceImage;
+    pipeline
+      .add_option("reference-image",
+                  referenceImage,
+                  "Reference image whose geometry defines the output grid. Only the metadata (origin, spacing, "
+                  "direction, size) is used, so an empty pixel buffer is acceptable.")
+      ->required()
+      ->type_name("INPUT_IMAGE");
+
+    using TransformType = itk::AffineTransform<double, Dimension>;
+    using InputTransformType = itk::wasm::InputTransform<TransformType>;
+    InputTransformType inputTransform;
+    pipeline
+      .add_option("-t,--transform",
+                  inputTransform,
+                  "Optional transform mapping output-grid points into the moving-image space. Defaults to identity.")
+      ->type_name("INPUT_TRANSFORM");
+
+    std::string interpolator = "linear";
+    pipeline
+      .add_option("-i,--interpolator", interpolator, "Interpolation method used to sample the moving image.")
+      ->check(
+        CLI::IsMember({ "linear", "nearest_neighbor", "label_image", "b_spline", "windowed_sinc", "gaussian" }));
+
+    using OutputImageType = itk::wasm::OutputImage<VectorImageType>;
+    OutputImageType outputImage;
+    pipeline.add_option("output", outputImage, "The resampled output image.")->required()->type_name("OUTPUT_IMAGE");
+
+    ITK_WASM_PARSE(pipeline);
+
+    typename VectorImageType::ConstPointer movingImage = inputImage.Get();
+    typename VectorImageType::ConstPointer referenceGeometry = referenceImage.Get();
+    const TransformType *                  transform = inputTransform.Get();
+
+    const unsigned int numberOfComponents = movingImage->GetNumberOfComponentsPerPixel();
+
+    using ExtractFilterType = itk::VectorIndexSelectionCastImageFilter<VectorImageType, ScalarImageType>;
+    using ResampleFilterType = itk::ResampleImageFilter<ScalarImageType, ScalarImageType>;
+    using ComposeFilterType = itk::ComposeImageFilter<ScalarImageType>;
+
+    auto composeFilter = ComposeFilterType::New();
+
+    // itk::DataObject holds only a WeakPointer back to its producing filter, so
+    // every per-component filter must stay alive until the single, final compose
+    // update below pulls the data through the whole pipeline.
+    std::vector<typename ExtractFilterType::Pointer>  extractFilters;
+    std::vector<typename ResampleFilterType::Pointer> resampleFilters;
+    extractFilters.reserve(numberOfComponents);
+    resampleFilters.reserve(numberOfComponents);
+
+    for (unsigned int component = 0; component < numberOfComponents; ++component)
+    {
+      auto extractFilter = ExtractFilterType::New();
+      extractFilter->SetInput(movingImage);
+      extractFilter->SetIndex(component);
+      extractFilters.push_back(extractFilter);
+
+      // Reuse the shared scalar wiring; the moving VectorImage's own geometry is
+      // a valid itk::ImageBase reference for each single-component output grid.
+      auto resampleFilter = MakeResampleFilter<ScalarImageType>(
+        extractFilter->GetOutput(), referenceGeometry.GetPointer(), transform, interpolator);
+      resampleFilters.push_back(resampleFilter);
+
+      composeFilter->SetInput(component, resampleFilter->GetOutput());
+    }
+
+    ITK_WASM_CATCH_EXCEPTION(pipeline, composeFilter->UpdateLargestPossibleRegion());
+
+    typename VectorImageType::ConstPointer result = composeFilter->GetOutput();
     outputImage.Set(result);
 
     return EXIT_SUCCESS;
@@ -170,7 +309,7 @@ main(int argc, char * argv[])
 {
   itk::wasm::Pipeline pipeline(
     "resample",
-    "Resample a scalar image onto a reference image's grid with an optional transform and a selectable interpolator.",
+    "Resample an image onto a reference image's grid with an optional transform and a selectable interpolator.",
     argc,
     argv);
 
@@ -184,5 +323,11 @@ main(int argc, char * argv[])
                                            uint64_t,
                                            int64_t,
                                            float,
-                                           double>::Dimensions<2U, 3U, 4U>("input", pipeline);
+                                           double,
+                                           itk::VariableLengthVector<uint8_t>,
+                                           itk::VariableLengthVector<uint16_t>,
+                                           itk::VariableLengthVector<int16_t>,
+                                           itk::VariableLengthVector<float>,
+                                           itk::VariableLengthVector<double>>::Dimensions<2U, 3U, 4U>("input",
+                                                                                                       pipeline);
 }

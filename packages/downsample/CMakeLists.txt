@@ -84,3 +84,55 @@ add_test(NAME resample
     ${CMAKE_CURRENT_BINARY_DIR}/cthead1_resampled.png
     --interpolator linear
     )
+
+# Interpolator coverage: one self-contained test per interpolator, using
+# cthead1.png as both the moving image and the reference geometry (identity
+# transform), so every interpolator selection is exercised. Needs no new data.
+add_test(NAME resample-linear
+  COMMAND resample
+    ${CMAKE_CURRENT_SOURCE_DIR}/test/data/input/cthead1.png
+    ${CMAKE_CURRENT_SOURCE_DIR}/test/data/input/cthead1.png
+    ${CMAKE_CURRENT_BINARY_DIR}/cthead1_resampled_linear.png
+    --interpolator linear
+    )
+
+add_test(NAME resample-nearest-neighbor
+  COMMAND resample
+    ${CMAKE_CURRENT_SOURCE_DIR}/test/data/input/cthead1.png
+    ${CMAKE_CURRENT_SOURCE_DIR}/test/data/input/cthead1.png
+    ${CMAKE_CURRENT_BINARY_DIR}/cthead1_resampled_nearest_neighbor.png
+    --interpolator nearest_neighbor
+    )
+
+add_test(NAME resample-b-spline
+  COMMAND resample
+    ${CMAKE_CURRENT_SOURCE_DIR}/test/data/input/cthead1.png
+    ${CMAKE_CURRENT_SOURCE_DIR}/test/data/input/cthead1.png
+    ${CMAKE_CURRENT_BINARY_DIR}/cthead1_resampled_b_spline.png
+    --interpolator b_spline
+    )
+
+add_test(NAME resample-windowed-sinc
+  COMMAND resample
+    ${CMAKE_CURRENT_SOURCE_DIR}/test/data/input/cthead1.png
+    ${CMAKE_CURRENT_SOURCE_DIR}/test/data/input/cthead1.png
+    ${CMAKE_CURRENT_BINARY_DIR}/cthead1_resampled_windowed_sinc.png
+    --interpolator windowed_sinc
+    )
+
+add_test(NAME resample-gaussian
+  COMMAND resample
+    ${CMAKE_CURRENT_SOURCE_DIR}/test/data/input/cthead1.png
+    ${CMAKE_CURRENT_SOURCE_DIR}/test/data/input/cthead1.png
+    ${CMAKE_CURRENT_BINARY_DIR}/cthead1_resampled_gaussian.png
+    --interpolator gaussian
+    )
+
+# Label-image interpolator on the existing multi-label test image.
+add_test(NAME resample-label-image
+  COMMAND resample
+    ${CMAKE_CURRENT_SOURCE_DIR}/test/data/input/2th_cthead1.png
+    ${CMAKE_CURRENT_SOURCE_DIR}/test/data/input/2th_cthead1.png
+    ${CMAKE_CURRENT_BINARY_DIR}/2th_cthead1_resampled_label_image.png
+    --interpolator label_image
+    )
